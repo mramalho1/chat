@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Fake</title>
+
+    <style>
+        /* Reset e configuração geral */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    background-color: #efeae2;
+    overflow: hidden;
+}
+
+/* Cabeçalho estilo WhatsApp sem precisar alterar o HTML */
+body::before {
+    content: "Chat Fake  •  online";
+    display: flex;
+    align-items: center;
+    background-color: #008069;
+    color: #ffffff;
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 14px 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+/* Área de mensagens com fundo clássico do WhatsApp */
+#mensagens {
+    flex: 1;
+    list-style: none;
+    padding: 20px 6%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #efeae2;
+    background-image: radial-gradient(#d5cec2 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* Scrollbar personalizada estilo WhatsApp Web */
+#mensagens::-webkit-scrollbar {
+    width: 6px;
+}
+
+#mensagens::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+/* Balões de mensagem */
+#mensagens li {
+    position: relative;
+    background-color: #ffffff;
+    color: #111b21;
+    padding: 9px 14px;
+    border-radius: 10px;
+    border-top-left-radius: 2px;
+    max-width: 75%;
+    width: fit-content;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    box-shadow: 0 1px 1px rgba(11, 20, 26, 0.13);
+    animation: surgirMensagem 0.18s ease-out;
+}
+
+/* Pontinha (triângulo) do balão de mensagem */
+#mensagens li::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -8px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid #ffffff;
+    border-left: 8px solid transparent;
+}
+
+@keyframes surgirMensagem {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Barra inferior do formulário */
+form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background-color: #f0f2f5;
+    border-top: 1px solid #d1d7db;
+    flex-shrink: 0;
+}
+
+/* Campos de texto */
+form input[type="text"] {
+    border: none;
+    outline: none;
+    background-color: #ffffff;
+    color: #111b21;
+    font-size: 0.95rem;
+    padding: 11px 16px;
+    border-radius: 24px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+form input[type="text"]::placeholder {
+    color: #667781;
+}
+
+form input[type="text"]:focus {
+    box-shadow: 0 0 0 2px rgba(0, 168, 132, 0.35);
+}
+
+/* Campo de nome */
+#nome {
+    width: 180px;
+    flex-shrink: 0;
+}
+
+/* Visual de crachá quando o nome é travado após a 1ª mensagem */
+#nome:disabled {
+    background-color: #d9fdd3;
+    color: #008069;
+    font-weight: 600;
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+/* Campo da mensagem ocupa o espaço restante */
+#mensagem {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Botão Enviar estilo WhatsApp */
+form button {
+    background-color: #00a884;
+    color: #ffffff;
+    border: none;
+    outline: none;
+    padding: 11px 22px;
+    border-radius: 24px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+form button:hover {
+    background-color: #008f6f;
+}
+
+form button:active {
+    transform: scale(0.97);
+}
+
+/* Responsividade para celulares */
+@media (max-width: 600px) {
+    #mensagens {
+        padding: 16px 14px;
+    }
+
+    #mensagens li {
+        max-width: 85%;
+    }
+
+    form {
+        flex-wrap: wrap;
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    #nome {
+        width: 100%;
+    }
+
+    #mensagem {
+        flex: 1;
+    }
+}
+    </style>
+
+</head>
+<body>
+
+    <ul id="mensagens"></ul>
+    <form action="">
+        <input type="text" id="nome" placeholder="Digite o seu nome" autocomplete="off">
+        <input type="text" id="mensagem" placeholder="Digite a sua mensagem" autocomplete="off">
+        <button>Enviar</button>
+    </form>
+    
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+
+        // Cria uma instância do Socket.IO
+      const socket = io();
+      // Seleciona o input do nome do usuário
+      const nomeInput = document.getElementById('nome');
+      // Seleciona o input da mensagem
+      const mensagemInput = document.getElementById('mensagem');
+      // Seleciona a lista de mensagens
+      const mensagens = document.getElementById('mensagens');
+
+      // Adiciona um evento de escuta para o envio do formulário
+      document.querySelector('form').addEventListener('submit', event => {
+        // Previne o envio padrão do formulário
+        event.preventDefault();
+        // Obtém o valor do input do nome do usuário
+        const nome = nomeInput.value;
+        // Obtém o valor do input da mensagem
+        const mensagem = mensagemInput.value;
+        // Verifica se ambos os campos foram preenchidos antes de enviar a mensagem
+        // Verifica se os valores são válidos (não estão em branco)
+        //trim() é um método da linguagem JavaScript que remove os espaços em branco do início e do final de uma string.
+        // emit envia um evento chamado "chat message" com um objeto contendo os valores de nome e mensagem para o servidor.
+        nome.trim() && mensagem.trim() && socket.emit('chat message', { nome, mensagem });
+        // Limpa o input da mensagem
+        mensagemInput.value = '';
+        // Desabilita o input do nome do usuário após a primeira mensagem
+        nomeInput.disabled = true; 
+      });
+
+      // Adiciona um evento de escuta para o evento de mensagem recebido do servidor
+      socket.on('chat message', dados => {
+        // Cria um elemento de lista para exibir a mensagem
+        const lista = document.createElement('li');
+        // Define o texto da mensagem
+        lista.textContent = `${dados.nome}: ${dados.mensagem}`;
+        // Adiciona o elemento de lista à lista de mensagens
+        mensagens.appendChild(lista);
+      });
+
+    </script>
+</body>
+</html>
