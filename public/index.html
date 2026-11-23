@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Interno • Empresa XYZ</title>
+
+    <style>
+        /* Reset e configuração geral (corrigido de '-' para '*') */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            height: 100dvh;
+            background-color: #efeae2;
+            overflow: hidden;
+            color: #111b21;
+        }
+
+        /* ================= TELA DE AUTENTICAÇÃO ================= */
+        #tela-login {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg, #00a884 0%, #00a884 28%, #d1d7db 28%, #efeae2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 16px;
+        }
+
+        .card-login {
+            background: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 12px;
+            padding: 32px 28px;
+            box-shadow: 0 12px 32px rgba(11, 20, 26, 0.18);
+        }
+
+        .card-login h1 {
+            color: #008069;
+            font-size: 1.45rem;
+            margin-bottom: 6px;
+        }
+
+        .card-login p {
+            color: #667781;
+            font-size: 0.9rem;
+            margin-bottom: 22px;
+        }
+
+        .campo-login {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .campo-login label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #3b4a54;
+        }
+
+        .campo-login input {
+            padding: 11px 14px;
+            border: 1px solid #d1d7db;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .campo-login input:focus {
+            border-color: #00a884;
+        }
+
+        .dica-codigo {
+            font-size: 0.78rem;
+            color: #667781;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        #erro-login {
+            display: none;
+            background-color: #fdecea;
+            color: #b71c1c;
+            border-left: 4px solid #d32f2f;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 14px;
+        }
+
+        #btn-entrar {
+            width: 100%;
+            background-color: #00a884;
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #btn-entrar:hover {
+            background-color: #008069;
+        }
+
+        /* ================= ESTRUTURA PRINCIPAL WHATSAPP WEB ================= */
+        #app-chat {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Barra Lateral (Salas + Usuários Online) */
+        #sidebar {
+            width: 310px;
+            background-color: #ffffff;
+            border-right: 1px solid #d1d7db;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        .sidebar-header {
+            background-color: #008069;
+            color: #ffffff;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .perfil-usuario {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #d9fdd3;
+            color: #008069;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-conteudo {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .secao-titulo {
+            padding: 12px 16px 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #008069;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9edef;
+        }
+
+        #btn-nova-sala {
+            background: #00a884;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        #btn-nova-sala:hover {
+            background: #008069;
+        }
+
+        .lista-lateral {
+            list-style: none;
+        }
+
+        .item-lateral {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f2f5;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background-color 0.15s;
+            font-size: 0.93rem;
+        }
+
+        .item-lateral:hover {
+            background-color: #f5f6f6;
+        }
+
+        .item-lateral.ativo {
+            background-color: #e9edef;
+            font-weight: 600;
+        }
+
+        .status-online {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            background-color: #00a884;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .badge-nao-lida {
+            background-color: #25d366;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 12px;
+        }
+
+        /* Área Direita (Conversa) */
+        .area-conversa {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            position: relative;
+        }
+
+        /* Cabeçalho estilo WhatsApp */
+        .chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #008069;
+            color: #ffffff;
+            padding: 0 20px;
+            height: 60px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #btn-menu-mobile {
+            display: none;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        .chat-titulo {
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .chat-subtitulo {
+            font-size: 0.8rem;
+            color: #d9fdd3;
+        }
+
+        /* Banner de alerta/erro */
+        #banner-erro {
+            display: none;
+            background-color: #fdecea;
+            color: #b71c1c;
+            padding: 8px 16px;
+            font-size: 0.88rem;
+            text-align: center;
+            border-bottom: 1px solid #f5c6cb;
+            font-weight: 500;
+        }
+
+        /* Área de mensagens com fundo clássico do WhatsApp */
+        #mensagens {
+            flex: 1;
+            list-style: none;
+            padding: 20px 6%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #efeae2;
+            background-image: radial-gradient(#d5cec2 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        #mensagens::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #mensagens::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+
+        /* Balões de mensagem recebida (esquerda - branco) */
+        #mensagens li.msg-recebida {
+            position: relative;
+            align-self: flex-start;
+            background-color: #ffffff;
+            color: #111b21;
+            padding: 8px 14px;
+            border-radius: 10px;
+            border-top-left-radius: 2px;
+            max-width: 72%;
+            width: fit-content;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+            box-shadow: 0 1px 1px rgba(11, 20, 26, 0.13);
+            animation: surgirMensagem 0.18s ease-out;
+        }
+
+        #mensagens li.msg-recebida::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -8px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid #ffffff;
+            border-left: 8px solid transparent;
+        }
+
+        /* Balões de mensagem enviada pelo próprio usuário (direita - verde WhatsApp) */
+        #mensagens li.msg-enviada {
+            position: relative;
+            align-self: flex-end;
+            background-color: #d9fdd3;
+            color: #111b21;
+            padding: 8px 14px;
+            border-radius: 10px;
+            border-top-right-radius: 2px;
+            max-width: 72%;
+            width: fit-content;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+            box-shadow: 0 1px 1px rgba(11, 20, 26, 0.13);
+            animation: surgirMensagem 0.18s ease-out;
+        }
+
+        #mensagens li.msg-enviada::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: -8px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid #d9fdd3;
+            border-right: 8px solid transparent;
+        }
+
+        .msg-autor {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #008069;
+            margin-bottom: 2px;
+        }
+
+        .msg-rodape {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 4px;
+            margin-top: 3px;
+            font-size: 0.7rem;
+            color: #667781;
+        }
+
+        /* Mensagem de sistema (novo usuário entrou / saiu) */
+        #mensagens li.msg-sistema {
+            align-self: center;
+            background-color: #e1f3fb;
+            color: #3b4a54;
+            font-size: 0.8rem;
+            padding: 5px 14px;
+            border-radius: 8px;
+            box-shadow: 0 1px 1px rgba(11, 20, 26, 0.08);
+            text-align: center;
+        }
+
+        @keyframes surgirMensagem {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Barra inferior do formulário */
+        form#form-mensagem {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            background-color: #f0f2f5;
+            border-top: 1px solid #d1d7db;
+            flex-shrink: 0;
+        }
+
+        form#form-mensagem input[type="text"] {
+            border: none;
+            outline: none;
+            background-color: #ffffff;
+            color: #111b21;
+            font-size: 0.95rem;
+            padding: 11px 16px;
+            border-radius: 24px;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
+            transition: box-shadow 0.2s ease;
+            flex: 1;
+            min-width: 0;
+        }
+
+        form#form-mensagem input[type="text"]:focus {
+            box-shadow: 0 0 0 2px rgba(0, 168, 132, 0.35);
+        }
+
+        form#form-mensagem button {
+            background-color: #00a884;
+            color: #ffffff;
+            border: none;
+            outline: none;
+            padding: 11px 22px;
+            border-radius: 24px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        form#form-mensagem button:hover {
+            background-color: #008f6f;
+        }
+
+        form#form-mensagem button:active {
+            transform: scale(0.97);
+        }
+
+        /* Responsividade para celulares */
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: -310px;
+                transition: left 0.25s ease;
+            }
+
+            #sidebar.aberto {
+                left: 0;
+                box-shadow: 4px 0 16px rgba(0, 0, 0, 0.25);
+            }
+
+            #btn-menu-mobile {
+                display: block;
+            }
+
+            #mensagens {
+                padding: 16px 14px;
+            }
+
+            #mensagens li.msg-recebida,
+            #mensagens li.msg-enviada {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TELA DE LOGIN CORPORATIVO -->
+    <div id="tela-login">
+        <div class="card-login">
+            <h1>Empresa XYZ • Chat Interno</h1>
+            <p>Identifique-se para acessar os canais da equipe.</p>
+
+            <div id="erro-login"></div>
+
+            <div class="campo-login">
+                <label for="login-nome">Nome completo ou apelido</label>
+                <input type="text" id="login-nome" placeholder="Ex: Ana Silva" autocomplete="off">
+            </div>
+
+            <div class="campo-login">
+                <label for="login-email">E-mail corporativo</label>
+                <input type="email" id="login-email" placeholder="ana.silva@xyz.com" autocomplete="off">
+            </div>
+
+            <div class="campo-login">
+                <label for="login-codigo">Código de acesso da empresa</label>
+                <input type="password" id="login-codigo" placeholder="Digite o código corporativo">
+            </div>
+            <div class="dica-codigo">Código padrão de teste: <strong>xyz2026</strong></div>
+
+            <button id="btn-entrar" type="button">Entrar no Chat</button>
+        </div>
+    </div>
+
+    <!-- APLICAÇÃO PRINCIPAL DO CHAT -->
+    <div id="app-chat">
+        <!-- BARRA LATERAL -->
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <div class="perfil-usuario">
+                    <div class="avatar" id="meu-avatar">XY</div>
+                    <div>
+                        <div id="meu-nome-exibicao">Usuário</div>
+                        <small style="color: #d9fdd3; font-weight: 400;">Online</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-conteudo">
+                <div class="secao-titulo">
+                    <span>Salas da Empresa</span>
+                    <button id="btn-nova-sala" title="Criar nova sala">+ Sala</button>
+                </div>
+                <ul class="lista-lateral" id="lista-salas"></ul>
+
+                <div class="secao-titulo">
+                    <span>Colaboradores Online (Privado)</span>
+                </div>
+                <ul class="lista-lateral" id="lista-usuarios"></ul>
+            </div>
+        </aside>
+
+        <!-- ÁREA DE MENSAGENS -->
+        <main class="area-conversa">
+            <header class="chat-header">
+                <div class="chat-header-info">
+                    <button id="btn-menu-mobile" aria-label="Abrir menu">☰</button>
+                    <div>
+                        <div class="chat-titulo" id="cabecalho-titulo"># Geral</div>
+                        <div class="chat-subtitulo" id="cabecalho-subtitulo">Canal público da equipe • online</div>
+                    </div>
+                </div>
+            </header>
+
+            <div id="banner-erro"></div>
+
+            <ul id="mensagens"></ul>
+
+            <form id="form-mensagem" action="">
+                <input type="text" id="mensagem" placeholder="Digite sua mensagem..." autocomplete="off">
+                <button type="submit">Enviar</button>
+            </form>
+        </main>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        // Estado da aplicação no Front-End
+        let usuarioAtual = null;
+        let modoConversa = 'sala'; // 'sala' ou 'privada'
+        let destinoAtual = 'Geral'; // Nome da sala ou nome do destinatário privado
+        let salasLista = [];
+        let usuariosLista = [];
+        const naoLidasPrivadas = {};
+
+        // Elementos DOM - Login
+        const telaLogin = document.getElementById('tela-login');
+        const appChat = document.getElementById('app-chat');
+        const loginNome = document.getElementById('login-nome');
+        const loginEmail = document.getElementById('login-email');
+        const loginCodigo = document.getElementById('login-codigo');
+        const erroLogin = document.getElementById('erro-login');
+        const btnEntrar = document.getElementById('btn-entrar');
+
+        // Elementos DOM - Chat
+        const sidebar = document.getElementById('sidebar');
+        const btnMenuMobile = document.getElementById('btn-menu-mobile');
+        const listaSalasEl = document.getElementById('lista-salas');
+        const listaUsuariosEl = document.getElementById('lista-usuarios');
+        const btnNovaSala = document.getElementById('btn-nova-sala');
+        const cabecalhoTitulo = document.getElementById('cabecalho-titulo');
+        const cabecalhoSubtitulo = document.getElementById('cabecalho-subtitulo');
+        const bannerErro = document.getElementById('banner-erro');
+        const mensagensEl = document.getElementById('mensagens');
+        const formMensagem = document.getElementById('form-mensagem');
+        const mensagemInput = document.getElementById('mensagem');
+
+        // Funções de Feedback e Validação
+        function mostrarErroLogin(texto) {
+            erroLogin.textContent = texto;
+            erroLogin.style.display = 'block';
+        }
+
+        function mostrarBannerErro(texto) {
+            bannerErro.textContent = texto;
+            bannerErro.style.display = 'block';
+            setTimeout(() => {
+                bannerErro.style.display = 'none';
+            }, 4000);
+        }
+
+        function rolarParaFinal() {
+            mensagensEl.scrollTop = mensagensEl.scrollHeight;
+        }
+
+        // Submissão do Login
+        function realizarLogin() {
+            erroLogin.style.display = 'none';
+            const nome = loginNome.value.trim();
+            const email = loginEmail.value.trim();
+            const codigo = loginCodigo.value.trim();
+
+            if (!nome || !email || !codigo) {
+                mostrarErroLogin('Por favor, preencha nome, e-mail corporativo e código de acesso.');
+                return;
+            }
+
+            socket.emit('autenticar', { nome, email, codigo });
+        }
+
+        btnEntrar.addEventListener('click', realizarLogin);
+        loginCodigo.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') realizarLogin();
+        });
+
+        // Resposta de erro na autenticação
+        socket.on('erro autenticacao', (mensagem) => {
+            mostrarErroLogin(mensagem);
+        });
+
+        // Autenticação bem-sucedida
+        socket.on('autenticado', ({ usuario, salas, historico }) => {
+            usuarioAtual = usuario;
+            salasLista = salas;
+            modoConversa = 'sala';
+            destinoAtual = usuario.sala;
+
+            document.getElementById('meu-nome-exibicao').textContent = usuario.nome;
+            document.getElementById('meu-avatar').textContent = usuario.nome.slice(0, 2).toUpperCase();
+
+            telaLogin.style.display = 'none';
+            appChat.style.display = 'flex';
+
+            renderizarSalas();
+            renderizarHistorico(historico);
+            mensagemInput.focus();
+        });
+
+        // Renderiza lista de salas na barra lateral
+        function renderizarSalas() {
+            listaSalasEl.innerHTML = '';
+            salasLista.forEach((sala) => {
+                const li = document.createElement('li');
+                li.className = 'item-lateral' + (modoConversa === 'sala' && destinoAtual === sala ? ' ativo' : '');
+                li.textContent = `# ${sala}`;
+                li.addEventListener('click', () => {
+                    modoConversa = 'sala';
+                    destinoAtual = sala;
+                    cabecalhoTitulo.textContent = `# ${sala}`;
+                    cabecalhoSubtitulo.textContent = 'Canal público da equipe • online';
+                    socket.emit('entrar sala', sala);
+                    renderizarSalas();
+                    renderizarUsuarios();
+                    sidebar.classList.remove('aberto');
+                });
+                listaSalasEl.appendChild(li);
+            });
+        }
+
+        // Renderiza lista de usuários online para mensagens privadas
+        function renderizarUsuarios() {
+            listaUsuariosEl.innerHTML = '';
+            const colegas = usuariosLista.filter((u) => u.nome !== usuarioAtual?.nome);
+
+            if (colegas.length === 0) {
+                const vazio = document.createElement('li');
+                vazio.className = 'item-lateral';
+                vazio.style.color = '#667781';
+                vazio.style.cursor = 'default';
+                vazio.textContent = 'Nenhum outro colega online';
+                listaUsuariosEl.appendChild(vazio);
+                return;
+            }
+
+            colegas.forEach((colega) => {
+                const li = document.createElement('li');
+                li.className = 'item-lateral' + (modoConversa === 'privada' && destinoAtual === colega.nome ? ' ativo' : '');
+
+                const info = document.createElement('span');
+                info.innerHTML = `<span class="status-online"></span>${colega.nome}`;
+                li.appendChild(info);
+
+                const qtdNaoLida = naoLidasPrivadas[colega.nome] || 0;
+                if (qtdNaoLida > 0) {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge-nao-lida';
+                    badge.textContent = qtdNaoLida;
+                    li.appendChild(badge);
+                }
+
+                li.addEventListener('click', () => {
+                    modoConversa = 'privada';
+                    destinoAtual = colega.nome;
+                    naoLidasPrivadas[colega.nome] = 0;
+                    cabecalhoTitulo.textContent = `🔒 ${colega.nome}`;
+                    cabecalhoSubtitulo.textContent = 'Conversa privada • histórico salvo';
+                    socket.emit('abrir privado', colega.nome);
+                    renderizarSalas();
+                    renderizarUsuarios();
+                    sidebar.classList.remove('aberto');
+                });
+
+                listaUsuariosEl.appendChild(li);
+            });
+        }
+
+        // Adiciona uma mensagem na tela
+        function adicionarMensagemNaTela(dados) {
+            const li = document.createElement('li');
+            const ehMinha = dados.nome === usuarioAtual?.nome;
+
+            li.className = ehMinha ? 'msg-enviada' : 'msg-recebida';
+
+            if (!ehMinha && modoConversa === 'sala') {
+                const autor = document.createElement('span');
+                autor.className = 'msg-autor';
+                autor.textContent = dados.nome;
+                li.appendChild(autor);
+            }
+
+            const texto = document.createElement('span');
+            texto.textContent = dados.mensagem;
+            li.appendChild(texto);
+
+            const rodape = document.createElement('div');
+            rodape.className = 'msg-rodape';
+            rodape.textContent = dados.hora || '';
+            li.appendChild(rodape);
+
+            mensagensEl.appendChild(li);
+            rolarParaFinal();
+        }
+
+        function adicionarMensagemSistema(texto) {
+            const li = document.createElement('li');
+            li.className = 'msg-sistema';
+            li.textContent = texto;
+            mensagensEl.appendChild(li);
+            rolarParaFinal();
+        }
+
+        function renderizarHistorico(lista) {
+            mensagensEl.innerHTML = '';
+            lista.forEach((msg) => adicionarMensagemNaTela(msg));
+        }
+
+        // Criar nova sala
+        btnNovaSala.addEventListener('click', () => {
+            const nomeSala = prompt('Digite o nome da nova sala (ex: Marketing):');
+            if (nomeSala && nomeSala.trim()) {
+                socket.emit('criar sala', nomeSala.trim());
+            }
+        });
+
+        // Envio do formulário de mensagem com validação
+        formMensagem.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const mensagem = mensagemInput.value.trim();
+
+            if (!mensagem) {
+                mostrarBannerErro('Digite uma mensagem antes de enviar.');
+                mensagemInput.focus();
+                return;
+            }
+
+            if (modoConversa === 'sala') {
+                socket.emit('chat message', { mensagem });
+            } else {
+                socket.emit('private message', { para: destinoAtual, mensagem });
+            }
+
+            mensagemInput.value = '';
+            mensagemInput.focus();
+        });
+
+        // Eventos recebidos do Socket.io
+        socket.on('chat message', (dados) => {
+            if (modoConversa === 'sala' && (dados.sala || 'Geral') === destinoAtual) {
+                adicionarMensagemNaTela(dados);
+            }
+        });
+
+        socket.on('private message', (dados) => {
+            const outroUsuario = dados.de === usuarioAtual?.nome ? dados.para : dados.de;
+
+            if (modoConversa === 'privada' && destinoAtual === outroUsuario) {
+                adicionarMensagemNaTela(dados);
+            } else if (dados.de !== usuarioAtual?.nome) {
+                naoLidasPrivadas[dados.de] = (naoLidasPrivadas[dados.de] || 0) + 1;
+                renderizarUsuarios();
+            }
+        });
+
+        socket.on('historico sala', ({ sala, mensagens }) => {
+            if (modoConversa === 'sala' && destinoAtual === sala) {
+                renderizarHistorico(mensagens);
+            }
+        });
+
+        socket.on('historico privado', ({ com, mensagens }) => {
+            if (modoConversa === 'privada' && destinoAtual === com) {
+                renderizarHistorico(mensagens);
+            }
+        });
+
+        socket.on('system message', (texto) => {
+            if (modoConversa === 'sala') {
+                adicionarMensagemSistema(texto);
+            }
+        });
+
+        socket.on('atualizar salas', (salas) => {
+            salasLista = salas;
+            renderizarSalas();
+        });
+
+        socket.on('usuarios online', (usuarios) => {
+            usuariosLista = usuarios;
+            renderizarUsuarios();
+        });
+
+        // Tratamento de erros de rede e servidor
+        socket.on('erro chat', (mensagem) => {
+            mostrarBannerErro(mensagem);
+        });
+
+        socket.on('disconnect', () => {
+            mostrarBannerErro('Conexão perdida com o servidor. Tentando reconectar...');
+        });
+
+        socket.on('connect', () => {
+            bannerErro.style.display = 'none';
+        });
+
+        // Menu responsivo mobile
+        btnMenuMobile.addEventListener('click', () => {
+            sidebar.classList.toggle('aberto');
+        });
+    </script>
+</body>
+</html>
