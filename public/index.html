@@ -6,7 +6,6 @@
     <title>Chat Interno • Empresa XYZ</title>
 
     <style>
-        /* Reset e configuração geral (corrigido de '-' para '*') */
         * {
             margin: 0;
             padding: 0;
@@ -124,7 +123,6 @@
             height: 100%;
         }
 
-        /* Barra Lateral (Salas + Usuários Online) */
         #sidebar {
             width: 310px;
             background-color: #ffffff;
@@ -242,7 +240,6 @@
             border-radius: 12px;
         }
 
-        /* Área Direita (Conversa) */
         .area-conversa {
             flex: 1;
             display: flex;
@@ -251,7 +248,6 @@
             position: relative;
         }
 
-        /* Cabeçalho estilo WhatsApp */
         .chat-header {
             display: flex;
             align-items: center;
@@ -290,7 +286,6 @@
             color: #d9fdd3;
         }
 
-        /* Banner de alerta/erro */
         #banner-erro {
             display: none;
             background-color: #fdecea;
@@ -302,7 +297,6 @@
             font-weight: 500;
         }
 
-        /* Área de mensagens com fundo clássico do WhatsApp */
         #mensagens {
             flex: 1;
             list-style: none;
@@ -325,13 +319,12 @@
             border-radius: 3px;
         }
 
-        /* Balões de mensagem recebida (esquerda - branco) */
         #mensagens li.msg-recebida {
             position: relative;
             align-self: flex-start;
             background-color: #ffffff;
             color: #111b21;
-            padding: 8px 14px;
+            padding: 8px 12px;
             border-radius: 10px;
             border-top-left-radius: 2px;
             max-width: 72%;
@@ -354,13 +347,12 @@
             border-left: 8px solid transparent;
         }
 
-        /* Balões de mensagem enviada pelo próprio usuário (direita - verde WhatsApp) */
         #mensagens li.msg-enviada {
             position: relative;
             align-self: flex-end;
             background-color: #d9fdd3;
             color: #111b21;
-            padding: 8px 14px;
+            padding: 8px 12px;
             border-radius: 10px;
             border-top-right-radius: 2px;
             max-width: 72%;
@@ -388,7 +380,17 @@
             font-size: 0.78rem;
             font-weight: 700;
             color: #008069;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
+        }
+
+        .msg-imagem {
+            display: block;
+            max-width: 100%;
+            max-height: 280px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            object-fit: cover;
         }
 
         .msg-rodape {
@@ -401,7 +403,6 @@
             color: #667781;
         }
 
-        /* Mensagem de sistema (novo usuário entrou / saiu) */
         #mensagens li.msg-sistema {
             align-self: center;
             background-color: #e1f3fb;
@@ -424,15 +425,126 @@
             }
         }
 
+        /* ================= PREVIEW DE IMAGEM E PAINEL DE EMOJIS ================= */
+        #preview-imagem-container {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #e9edef;
+            padding: 10px 16px;
+            border-top: 1px solid #d1d7db;
+            gap: 12px;
+        }
+
+        .preview-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.88rem;
+            color: #3b4a54;
+        }
+
+        #preview-imagem-thumb {
+            width: 54px;
+            height: 54px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #d1d7db;
+            background: #fff;
+        }
+
+        #btn-cancelar-imagem {
+            background: #d32f2f;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #painel-emojis {
+            display: none;
+            position: absolute;
+            bottom: 68px;
+            left: 16px;
+            width: 310px;
+            max-width: calc(100% - 32px);
+            background-color: #ffffff;
+            border: 1px solid #d1d7db;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(11, 20, 26, 0.18);
+            padding: 10px;
+            z-index: 30;
+        }
+
+        .emojis-titulo {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #667781;
+            margin-bottom: 8px;
+            padding-left: 4px;
+            text-transform: uppercase;
+        }
+
+        .grid-emojis {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            max-height: 190px;
+            overflow-y: auto;
+        }
+
+        .btn-emoji-item {
+            background: none;
+            border: none;
+            font-size: 1.35rem;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background-color 0.15s, transform 0.1s;
+        }
+
+        .btn-emoji-item:hover {
+            background-color: #f0f2f5;
+            transform: scale(1.12);
+        }
+
         /* Barra inferior do formulário */
         form#form-mensagem {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             padding: 10px 16px;
             background-color: #f0f2f5;
             border-top: 1px solid #d1d7db;
             flex-shrink: 0;
+        }
+
+        .btn-acao-chat {
+            background: none;
+            border: none;
+            color: #54656f;
+            font-size: 1.35rem;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background-color 0.15s, color 0.15s;
+        }
+
+        .btn-acao-chat:hover {
+            background-color: #e2e6e9;
+            color: #008069;
         }
 
         form#form-mensagem input[type="text"] {
@@ -453,7 +565,7 @@
             box-shadow: 0 0 0 2px rgba(0, 168, 132, 0.35);
         }
 
-        form#form-mensagem button {
+        form#form-mensagem button[type="submit"] {
             background-color: #00a884;
             color: #ffffff;
             border: none;
@@ -467,15 +579,14 @@
             transition: background-color 0.2s ease, transform 0.1s ease;
         }
 
-        form#form-mensagem button:hover {
+        form#form-mensagem button[type="submit"]:hover {
             background-color: #008f6f;
         }
 
-        form#form-mensagem button:active {
+        form#form-mensagem button[type="submit"]:active {
             transform: scale(0.97);
         }
 
-        /* Responsividade para celulares */
         @media (max-width: 768px) {
             #sidebar {
                 position: fixed;
@@ -537,7 +648,6 @@
 
     <!-- APLICAÇÃO PRINCIPAL DO CHAT -->
     <div id="app-chat">
-        <!-- BARRA LATERAL -->
         <aside id="sidebar">
             <div class="sidebar-header">
                 <div class="perfil-usuario">
@@ -563,7 +673,6 @@
             </div>
         </aside>
 
-        <!-- ÁREA DE MENSAGENS -->
         <main class="area-conversa">
             <header class="chat-header">
                 <div class="chat-header-info">
@@ -579,7 +688,30 @@
 
             <ul id="mensagens"></ul>
 
+            <!-- PAINEL FLUTUANTE DE EMOJIS -->
+            <div id="painel-emojis">
+                <div class="emojis-titulo">Selecione um emoji</div>
+                <div class="grid-emojis" id="grid-emojis"></div>
+            </div>
+
+            <!-- BARRA DE PREVIEW DE IMAGEM ANTES DO ENVIO -->
+            <div id="preview-imagem-container">
+                <div class="preview-info">
+                    <img id="preview-imagem-thumb" src="" alt="Pré-visualização">
+                    <div>
+                        <strong>Imagem pronta para envio</strong>
+                        <div id="preview-imagem-nome" style="font-size: 0.78rem; color: #667781;"></div>
+                    </div>
+                </div>
+                <button type="button" id="btn-cancelar-imagem" title="Remover imagem">✕</button>
+            </div>
+
+            <!-- FORMULÁRIO DE ENVIO -->
             <form id="form-mensagem" action="">
+                <button type="button" class="btn-acao-chat" id="btn-emojis" title="Inserir emoji">😊</button>
+                <button type="button" class="btn-acao-chat" id="btn-anexar-imagem" title="Enviar imagem">📎</button>
+                <input type="file" id="input-imagem" accept="image/*" style="display: none;">
+                
                 <input type="text" id="mensagem" placeholder="Digite sua mensagem..." autocomplete="off">
                 <button type="submit">Enviar</button>
             </form>
@@ -590,15 +722,23 @@
     <script>
         const socket = io();
 
-        // Estado da aplicação no Front-End
         let usuarioAtual = null;
-        let modoConversa = 'sala'; // 'sala' ou 'privada'
-        let destinoAtual = 'Geral'; // Nome da sala ou nome do destinatário privado
+        let modoConversa = 'sala';
+        let destinoAtual = 'Geral';
         let salasLista = [];
         let usuariosLista = [];
+        let imagemSelecionadaBase64 = null;
         const naoLidasPrivadas = {};
 
-        // Elementos DOM - Login
+        const LISTA_EMOJIS = [
+            '😀','😂','🤣','😊','😍','🥰','😎','🤔',
+            '😅','😢','😭','😡','🤯','🥳','😴','🤩',
+            '👍','👎','👏','🙌','🤝','🙏','💪','✌️',
+            '❤️','🧡','💛','💚','💙','💜','🔥','✨',
+            '🎉','🚀','💡','✅','❌','⚠️','📌','📅',
+            '💻','📊','📈','📁','📎','☕','🍕','🏆'
+        ];
+
         const telaLogin = document.getElementById('tela-login');
         const appChat = document.getElementById('app-chat');
         const loginNome = document.getElementById('login-nome');
@@ -607,7 +747,6 @@
         const erroLogin = document.getElementById('erro-login');
         const btnEntrar = document.getElementById('btn-entrar');
 
-        // Elementos DOM - Chat
         const sidebar = document.getElementById('sidebar');
         const btnMenuMobile = document.getElementById('btn-menu-mobile');
         const listaSalasEl = document.getElementById('lista-salas');
@@ -620,7 +759,113 @@
         const formMensagem = document.getElementById('form-mensagem');
         const mensagemInput = document.getElementById('mensagem');
 
-        // Funções de Feedback e Validação
+        const btnEmojis = document.getElementById('btn-emojis');
+        const painelEmojis = document.getElementById('painel-emojis');
+        const gridEmojis = document.getElementById('grid-emojis');
+        const btnAnexarImagem = document.getElementById('btn-anexar-imagem');
+        const inputImagem = document.getElementById('input-imagem');
+        const previewImagemContainer = document.getElementById('preview-imagem-container');
+        const previewImagemThumb = document.getElementById('preview-imagem-thumb');
+        const previewImagemNome = document.getElementById('preview-imagem-nome');
+        const btnCancelarImagem = document.getElementById('btn-cancelar-imagem');
+
+        // Inicializar grade de emojis
+        LISTA_EMOJIS.forEach((emoji) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn-emoji-item';
+            btn.textContent = emoji;
+            btn.addEventListener('click', () => {
+                const inicio = mensagemInput.selectionStart;
+                const fim = mensagemInput.selectionEnd;
+                const textoAtual = mensagemInput.value;
+                mensagemInput.value = textoAtual.substring(0, inicio) + emoji + textoAtual.substring(fim);
+                mensagemInput.focus();
+                mensagemInput.selectionStart = mensagemInput.selectionEnd = inicio + emoji.length;
+            });
+            gridEmojis.appendChild(btn);
+        });
+
+        btnEmojis.addEventListener('click', (e) => {
+            e.stopPropagation();
+            painelEmojis.style.display = painelEmojis.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!painelEmojis.contains(e.target) && e.target !== btnEmojis) {
+                painelEmojis.style.display = 'none';
+            }
+        });
+
+        // Compressão automática de imagem para evitar bloqueio do Socket.io
+        function comprimirImagem(arquivo, callback) {
+            const leitor = new FileReader();
+            leitor.onload = (evento) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 900; // Redimensiona mantendo proporção
+                    let largura = img.width;
+                    let altura = img.height;
+
+                    if (largura > maxDim || altura > maxDim) {
+                        if (largura > altura) {
+                            altura = Math.round((altura * maxDim) / largura);
+                            largura = maxDim;
+                        } else {
+                            largura = Math.round((largura * maxDim) / altura);
+                            altura = maxDim;
+                        }
+                    }
+
+                    canvas.width = largura;
+                    canvas.height = altura;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, largura, altura);
+
+                    // Converte para JPEG leve (qualidade 75%)
+                    const base64Comprimido = canvas.toDataURL('image/jpeg', 0.75);
+                    callback(base64Comprimido);
+                };
+                img.src = evento.target.result;
+            };
+            leitor.readAsDataURL(arquivo);
+        }
+
+        btnAnexarImagem.addEventListener('click', () => {
+            inputImagem.click();
+        });
+
+        inputImagem.addEventListener('change', (e) => {
+            const arquivo = e.target.files[0];
+            if (!arquivo) return;
+
+            if (!arquivo.type.startsWith('image/')) {
+                mostrarBannerErro('Por favor, selecione apenas arquivos de imagem.');
+                inputImagem.value = '';
+                return;
+            }
+
+            comprimirImagem(arquivo, (base64) => {
+                imagemSelecionadaBase64 = base64;
+                previewImagemThumb.src = base64;
+                previewImagemNome.textContent = arquivo.name;
+                previewImagemContainer.style.display = 'flex';
+                mensagemInput.placeholder = 'Adicione uma legenda (opcional)...';
+                mensagemInput.focus();
+            });
+        });
+
+        function limparImagemSelecionada() {
+            imagemSelecionadaBase64 = null;
+            inputImagem.value = '';
+            previewImagemThumb.src = '';
+            previewImagemContainer.style.display = 'none';
+            mensagemInput.placeholder = 'Digite sua mensagem...';
+        }
+
+        btnCancelarImagem.addEventListener('click', limparImagemSelecionada);
+
         function mostrarErroLogin(texto) {
             erroLogin.textContent = texto;
             erroLogin.style.display = 'block';
@@ -638,7 +883,6 @@
             mensagensEl.scrollTop = mensagensEl.scrollHeight;
         }
 
-        // Submissão do Login
         function realizarLogin() {
             erroLogin.style.display = 'none';
             const nome = loginNome.value.trim();
@@ -658,12 +902,10 @@
             if (e.key === 'Enter') realizarLogin();
         });
 
-        // Resposta de erro na autenticação
         socket.on('erro autenticacao', (mensagem) => {
             mostrarErroLogin(mensagem);
         });
 
-        // Autenticação bem-sucedida
         socket.on('autenticado', ({ usuario, salas, historico }) => {
             usuarioAtual = usuario;
             salasLista = salas;
@@ -681,7 +923,6 @@
             mensagemInput.focus();
         });
 
-        // Renderiza lista de salas na barra lateral
         function renderizarSalas() {
             listaSalasEl.innerHTML = '';
             salasLista.forEach((sala) => {
@@ -702,7 +943,6 @@
             });
         }
 
-        // Renderiza lista de usuários online para mensagens privadas
         function renderizarUsuarios() {
             listaUsuariosEl.innerHTML = '';
             const colegas = usuariosLista.filter((u) => u.nome !== usuarioAtual?.nome);
@@ -749,7 +989,6 @@
             });
         }
 
-        // Adiciona uma mensagem na tela
         function adicionarMensagemNaTela(dados) {
             const li = document.createElement('li');
             const ehMinha = dados.nome === usuarioAtual?.nome;
@@ -763,9 +1002,24 @@
                 li.appendChild(autor);
             }
 
-            const texto = document.createElement('span');
-            texto.textContent = dados.mensagem;
-            li.appendChild(texto);
+            if (dados.imagem) {
+                const img = document.createElement('img');
+                img.src = dados.imagem;
+                img.alt = 'Imagem enviada';
+                img.className = 'msg-imagem';
+                img.onload = rolarParaFinal;
+                img.addEventListener('click', () => {
+                    const novaAba = window.open();
+                    novaAba.document.write(`<img src="${dados.imagem}" style="max-width:100%; height:auto;">`);
+                });
+                li.appendChild(img);
+            }
+
+            if (dados.mensagem) {
+                const texto = document.createElement('span');
+                texto.textContent = dados.mensagem;
+                li.appendChild(texto);
+            }
 
             const rodape = document.createElement('div');
             rodape.className = 'msg-rodape';
@@ -789,7 +1043,6 @@
             lista.forEach((msg) => adicionarMensagemNaTela(msg));
         }
 
-        // Criar nova sala
         btnNovaSala.addEventListener('click', () => {
             const nomeSala = prompt('Digite o nome da nova sala (ex: Marketing):');
             if (nomeSala && nomeSala.trim()) {
@@ -797,28 +1050,33 @@
             }
         });
 
-        // Envio do formulário de mensagem com validação
         formMensagem.addEventListener('submit', (event) => {
             event.preventDefault();
             const mensagem = mensagemInput.value.trim();
 
-            if (!mensagem) {
-                mostrarBannerErro('Digite uma mensagem antes de enviar.');
+            if (!mensagem && !imagemSelecionadaBase64) {
+                mostrarBannerErro('Digite uma mensagem ou selecione uma imagem antes de enviar.');
                 mensagemInput.focus();
                 return;
             }
 
+            const payload = {
+                mensagem: mensagem,
+                imagem: imagemSelecionadaBase64
+            };
+
             if (modoConversa === 'sala') {
-                socket.emit('chat message', { mensagem });
+                socket.emit('chat message', payload);
             } else {
-                socket.emit('private message', { para: destinoAtual, mensagem });
+                socket.emit('private message', { para: destinoAtual, ...payload });
             }
 
             mensagemInput.value = '';
+            limparImagemSelecionada();
+            painelEmojis.style.display = 'none';
             mensagemInput.focus();
         });
 
-        // Eventos recebidos do Socket.io
         socket.on('chat message', (dados) => {
             if (modoConversa === 'sala' && (dados.sala || 'Geral') === destinoAtual) {
                 adicionarMensagemNaTela(dados);
@@ -864,7 +1122,6 @@
             renderizarUsuarios();
         });
 
-        // Tratamento de erros de rede e servidor
         socket.on('erro chat', (mensagem) => {
             mostrarBannerErro(mensagem);
         });
@@ -877,7 +1134,6 @@
             bannerErro.style.display = 'none';
         });
 
-        // Menu responsivo mobile
         btnMenuMobile.addEventListener('click', () => {
             sidebar.classList.toggle('aberto');
         });

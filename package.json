@@ -7,7 +7,9 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "socket.io": "^4.7.4"
+    "express": "^4.22.3",
+    "http": "^0.0.1-security",
+    "json-server": "^1.0.0-beta.15",
+    "socket.io": "^4.8.4"
   }
 }

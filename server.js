@@ -1,7 +1,9 @@
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+const io = require('socket.io')(http, {
+  maxHttpBufferSize: 5e6 // Permite envio de imagens de até 5MB
+});
 const fs = require('fs');
 const path = require('path');
 
@@ -185,7 +187,7 @@ io.on('connection', (socket) => {
     io.emit('system message', `${usuario.nome} criou a sala #${salaFormatada}`);
   });
 
-  // 4. Mensagem em sala pública
+  // 4. Mensagem em sala pública (Texto e/ou Imagem)
   socket.on('chat message', (data) => {
     const usuario = usuariosConectados[socket.id];
     if (!usuario) {
@@ -193,8 +195,10 @@ io.on('connection', (socket) => {
     }
 
     const texto = (data?.mensagem || '').trim();
-    if (!texto) {
-      return socket.emit('erro chat', 'A mensagem não pode estar vazia.');
+    const imagem = data?.imagem || null;
+
+    if (!texto && !imagem) {
+      return socket.emit('erro chat', 'Digite uma mensagem ou selecione uma imagem.');
     }
 
     const registroMensagem = {
@@ -203,6 +207,7 @@ io.on('connection', (socket) => {
       sala: usuario.sala,
       nome: usuario.nome,
       mensagem: texto,
+      imagem: imagem,
       hora: formatarHora()
     };
 
@@ -221,16 +226,18 @@ io.on('connection', (socket) => {
     });
   });
 
-  // 6. Envio de mensagem privada
-  socket.on('private message', ({ para, mensagem }) => {
+  // 6. Envio de mensagem privada (Texto e/ou Imagem)
+  socket.on('private message', ({ para, mensagem, imagem }) => {
     const usuario = usuariosConectados[socket.id];
     if (!usuario) {
       return socket.emit('erro chat', 'Sessão expirada. Faça login novamente.');
     }
 
     const texto = (mensagem || '').trim();
-    if (!texto || !para) {
-      return socket.emit('erro chat', 'Selecione um destinatário e digite uma mensagem.');
+    const imagemAnexada = imagem || null;
+
+    if ((!texto && !imagemAnexada) || !para) {
+      return socket.emit('erro chat', 'Selecione um destinatário e envie uma mensagem ou imagem.');
     }
 
     const registroPrivado = {
@@ -240,6 +247,7 @@ io.on('connection', (socket) => {
       para: para,
       nome: usuario.nome,
       mensagem: texto,
+      imagem: imagemAnexada,
       hora: formatarHora()
     };
 
